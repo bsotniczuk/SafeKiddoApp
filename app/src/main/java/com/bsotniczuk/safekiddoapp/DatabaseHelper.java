@@ -20,7 +20,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COL5 = "icon"; //Icon Address
     private static final String COL6 = "image_file"; //Icon Image file or Image File in case file inside the URL gets deleted
 
-
     public DatabaseHelper(Context context)//, String name, SQLiteDatabase.CursorFactory factory, int version)
     {
         super(context, TABLE_NAME, null, 1);
@@ -94,7 +93,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return data;
     }
 
-    public MessageModel/*Cursor*/ getIfExists(int ID) {
+    public MessageModel getIfExists(int ID) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         Cursor data = db.rawQuery("SELECT " + COL1 + ", " + COL2 + ", " + COL3 + ", " + COL4 + ", " + COL5 + ", " + COL6 +

@@ -6,46 +6,78 @@
     android:layout_height="match_parent"
     tools:context=".MessageActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/purple_safekiddo_500"
+        app:titleTextColor="@color/white"
+        app:layout_constraintTop_toTopOf="parent">
+    </androidx.appcompat.widget.Toolbar>
+
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp">
 
-            <TextView
+            <EditText
                 android:id="@+id/textView1Message"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
                 android:text="TextView"
+                android:textAlignment="center"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:textSize="20dp"
                 android:textStyle="bold"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/imageViewMessage"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1dp"
+                android:layout_marginTop="5dp"
                 app:layout_constraintTop_toBottomOf="@+id/textView1Message"
                 tools:srcCompat="@tools:sample/avatars" />
 
-            <TextView
+            <Button
+                android:id="@+id/button"
+                android:background="@drawable/ic_baseline_add_circle_24"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:layout_constraintTop_toBottomOf="@+id/textView1Message"/>
+
+            <EditText
                 android:id="@+id/textView2Message"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1dp"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/black"
                 android:text="TextView"
+                android:textSize="20dp"
                 app:layout_constraintTop_toBottomOf="@+id/imageViewMessage" />
 
             <TextView
                 android:id="@+id/textView3Message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="15dp"
+                android:textColor="@color/black"
                 android:text="TextView"
+                android:textAlignment="center"
+                android:textSize="20dp"
                 app:layout_constraintTop_toBottomOf="@+id/textView2Message" />
 
         </LinearLayout>

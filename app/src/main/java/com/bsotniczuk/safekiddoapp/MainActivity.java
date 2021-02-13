@@ -1,6 +1,7 @@
 package com.bsotniczuk.safekiddoapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import retrofit2.Call;
@@ -13,6 +14,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.bsotniczuk.safekiddoapp.adapter.AdapterRecyclerView;
@@ -29,23 +32,15 @@ public class MainActivity extends AppCompatActivity implements AdapterRecyclerVi
     //important
     //TODO: test path
     //TODO: Please enable internet connection prompt when internet is not enabled to download from API
-    //TODO: Repair Glide error related to loading last image with glide
     //TODO: Add ability to edit message
     //TODO: Add ability to add message
-    //TODO: Restyle message_item
-    //TODO: Count all characters in description
 
     //less important
-    //TODO: Restyle MessageActivity
-    //TODO: Restyle application colors
-    //TODO: Add application icon
     //TODO: Delete redundant code from DatabaseHelper
-    //TODO: Disable a possibility to open two messages at once
-    //TODO: Add toolbar back
-    //TODO: Add toolbar edit
     //Retrofit requires at minimum Java 8+ or Android API 21+.
 
     RecyclerView recyclerView;
+    AdapterRecyclerView adapter;
     List<MessageModel> messageListResponse;
     DatabaseHelper database;
 
@@ -54,16 +49,15 @@ public class MainActivity extends AppCompatActivity implements AdapterRecyclerVi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar toolbar = findViewById(R.id.toolbarMainActivity);
+        setSupportActionBar(toolbar);
+
         recyclerView = findViewById(R.id.recyclerView1);
         messageListResponse = new ArrayList<>();
 
         initDB();
 
         if (database.size() < 1) {
-            //SafeKiddo Api
-            //https://run.mocky.io/v3/6125f2d0-0688-4547-aae8-0295d984f196
-            Log.i("SafeKiddo", "Hello");
-
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl("https://run.mocky.io/")
                     .addConverterFactory(GsonConverterFactory.create())
@@ -97,7 +91,8 @@ public class MainActivity extends AppCompatActivity implements AdapterRecyclerVi
                     Log.i("SafeKiddo", "Data call to API failed: " + t);
                 }
             });
-        } else {
+        } 
+        else {
             for (int i = 0; i < database.size(); i++) {
                 if (database.checkIfExists(i)) {
                     messageListResponse.add(database.getIfExists(i));
@@ -106,11 +101,10 @@ public class MainActivity extends AppCompatActivity implements AdapterRecyclerVi
             populateRecyclerView(messageListResponse);
             Log.i("SafeKiddo", "Data successfully loaded from database and populated into RecyclerView");
         }
-
     }
 
     private void populateRecyclerView(List<MessageModel> messageList) {
-        AdapterRecyclerView adapter = new AdapterRecyclerView(this, messageList, this);
+        adapter = new AdapterRecyclerView(this, messageList, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
     }
@@ -123,9 +117,30 @@ public class MainActivity extends AppCompatActivity implements AdapterRecyclerVi
 
         Intent intent = new Intent(getApplicationContext(), MessageActivity.class);
         intent.putExtra("messageModel", messageListResponse.get(position));
+        intent.putExtra("idInDatabase", position);
         startActivity(intent);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main_activity, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_add) {
+            Log.i("SafeKiddo", "Action Add pressed");
+            messageListResponse.add(messageListResponse.get(2));
+            adapter.notifyItemInserted(messageListResponse.size());
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    //debug method, to delete
     public void initDB() {
         try {
             database = new DatabaseHelper(this);
