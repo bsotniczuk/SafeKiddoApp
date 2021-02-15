@@ -3,7 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.bsotniczuk.safekiddoapp">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -14,7 +16,6 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:theme="@style/Theme.SafeKiddoApp">
         <activity android:name=".MessageActivity"
-            android:launchMode="singleTop"
             android:theme="@style/Theme.SafeKiddoApp.NoActionBar">
         </activity>
         <activity android:name=".MainActivity"

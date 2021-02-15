@@ -3,4 +3,14 @@
     <string name="edit">edit</string>
     <string name="done">done</string>
     <string name="add">add</string>
+    <string name="title">Tytuł:</string>
+    <string name="description">Opis:</string>
+    <string name="clear">clear</string>
+    <string name="add_photo_text">dodaj zdjęcie z galerii\n(wymaga pozwolenia)</string>
+    <string name="message_cannot_be_empty">wypełnij pole lub pola</string>
+    <string name="want_to_save">Czy chcesz zachować zmiany?</string>
+    <string name="yes">tak</string>
+    <string name="no">nie</string>
+    <string name="number_of_chars_wo_space">Ilość znaków w opisie (bez spacji)</string>
+    <string name="number_of_chars">Ilość wszystkich znaków</string>
 </resources>

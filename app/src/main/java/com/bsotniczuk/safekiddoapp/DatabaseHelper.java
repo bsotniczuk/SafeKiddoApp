@@ -39,16 +39,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d(TAG, "onUpgrade: data altered");
     }
 
-    public boolean addData(int ID, String item1, String item2, String item3, String item4, String item5){
+    public boolean addData(int id, String idOfMessage, String title, String description, String icon, String imageFile){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(COL1, ID);
-        contentValues.put(COL2, item1);
-        contentValues.put(COL3, item2);
-        contentValues.put(COL4, item3);
-        contentValues.put(COL5, item4);
-        contentValues.put(COL6, item5);
-        Log.d(TAG, "addData: Adding " + item1 + " to " + TABLE_NAME);
+        contentValues.put(COL1, id);
+        contentValues.put(COL2, idOfMessage);
+        contentValues.put(COL3, title);
+        contentValues.put(COL4, description);
+        contentValues.put(COL5, icon);
+        contentValues.put(COL6, imageFile);
+        Log.d(TAG, "addData: Adding " + idOfMessage + " to " + TABLE_NAME);
 
         long result = db.insert(TABLE_NAME, null, contentValues);
 
@@ -73,24 +73,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return false;
         else
             return true;
-    }
-
-    public void deleteAllData() {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-    }
-
-    public Cursor getIfExists(String item)
-    {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        Cursor data = db.rawQuery("SELECT " + COL1 + ", " + COL2 + ", " + COL3 + ", " + COL4 + ", " + COL5 + ", " + COL6 +
-                " FROM " + TABLE_NAME +
-                " WHERE " + COL2 + " = '" + item + "'", null);
-        data.moveToFirst();
-
-        return data;
     }
 
     public MessageModel getIfExists(int ID) {
@@ -120,17 +102,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         data.moveToFirst(); //necessary
 
         return data;
-    }
-
-    public boolean checkIfExists(String item) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        Cursor data = db.rawQuery("SELECT " + COL1 + ", " + COL2 + ", " + COL3 + ", " + COL4 + ", " + COL5 + ", " + COL6 +
-                " FROM " + TABLE_NAME +
-                " WHERE " + COL2 + " = '" + item + "'", null);
-
-        if (data.moveToFirst()) return true;
-        else return false;
     }
 
     public boolean checkIfExists(int ID) {
@@ -174,14 +145,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return toReturn;
     }
 
-    public Cursor getLastFromDB() {
-        //SELECT * FROM Table ORDER BY ID DESC LIMIT 1
+    public int getLastId() {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String sqlStatement = "SELECT * FROM " + TABLE_NAME + " ORDER BY ID DESC LIMIT 1";
+        String sqlStatement = "SELECT " + COL1 + " FROM " + TABLE_NAME + " ORDER BY ID DESC LIMIT 1";
 
         Cursor data = db.rawQuery(sqlStatement, null);
-        return data;
+        if (data.moveToFirst()) {
+            data.getString(0);
+            return parseInt(data.getString(0));
+        }
+        else return -1;
     }
 
     private int parseInt(String toParse) {

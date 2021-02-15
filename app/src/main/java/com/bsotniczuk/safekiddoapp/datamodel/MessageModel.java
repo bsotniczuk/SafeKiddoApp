@@ -13,6 +13,13 @@ public class MessageModel implements Parcelable {
     public MessageModel() {
     }
 
+    public MessageModel(int id, String title, String description, String icon) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.icon = icon;
+    }
+
     public int getId() {
         return id;
     }
