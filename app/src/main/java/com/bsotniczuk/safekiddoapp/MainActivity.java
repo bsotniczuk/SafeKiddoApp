@@ -31,13 +31,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AdapterRecyclerView.OnMessageClickListener {
 
-    //important
-    //TODO: test path
-
-    //less important
-    //TODO: Delete redundant code from DatabaseHelper
     //Retrofit requires at minimum Java 8+ or Android API 21+, this App requires API 23+ in spite of checkSelfPermission()
-
     RecyclerView recyclerView;
     AdapterRecyclerView adapter;
     List<MessageModel> messageListResponse;
@@ -75,9 +69,8 @@ public class MainActivity extends AppCompatActivity implements AdapterRecyclerVi
                 }
             }
             populateRecyclerView(messageListResponse);
-        } else if (!isConnected) {
+        } else if (!isConnected)
             Toast.makeText(this, "Proszę włączyć sieć i przeładować aplikację", Toast.LENGTH_LONG).show();
-        }
     }
 
     private void fetchApiData() {

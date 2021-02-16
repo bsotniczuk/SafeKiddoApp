@@ -3,11 +3,9 @@ package com.bsotniczuk.safekiddoapp;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
-import android.animation.LayoutTransition;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,25 +28,25 @@ import com.bumptech.glide.Glide;
 
 public class MessageActivity extends AppCompatActivity {
 
-    EditText textView1; //title
-    EditText textView2; //description
-    TextView textView3; //number of characters
-    TextView textViewTitle; //title help when adding a message
-    TextView textViewDescription; //description help when adding a message
-    MenuItem actionEdit;
-    MenuItem actionDone;
-    MenuItem actionClear;
-    LinearLayout addPhotoLayout;
-    ImageView imageView;
+    private EditText textView1; //title
+    private EditText textView2; //description
+    private TextView textView3; //number of characters
+    private TextView textViewTitle; //title help when adding a message, or editing a message when title has less than 15 characters
+    private TextView textViewDescription; //description help when adding a message, or editing a message when description has less than 15 characters
+    private MenuItem actionEdit; //toolbar edit
+    private MenuItem actionDone; //toolbar done
+    private MenuItem actionClear; //toolbar discard a message (only visible when in ADD_MESSAGE_STATE)
+    private LinearLayout addPhotoLayout;
+    private ImageView imageView;
 
-    MessageState messageState;
-    MessageModel messageModel;
+    private MessageState messageState;
+    private MessageModel messageModel;
 
-    String imageUri;
+    private String imageUri;
 
-    DatabaseHelper database;
+    private DatabaseHelper database;
 
-    int position;
+    private int position;
 
     private static final int PICK_IMAGE = 3;
 
@@ -64,9 +62,9 @@ public class MessageActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         database = new DatabaseHelper(this);
-
         //set application state
-        //if position is higher than -1 that means that a MessageModel object has been sent from MainActivity, if position is -2, that means that user wants to add an object using MessageActivity class and its resources, I chose that approach not to add another PutExtra
+        //if position is higher than -1 that means that a MessageModel object has been sent from MainActivity
+        //if position is -2, that means that user wants to add an object using MessageActivity class and its resources, I chose that approach not to add another PutExtra, and not to add another redundant activity
         position = getIntent().getIntExtra("position", -1);
         if (position > -1) messageState = MessageState.STANDARD_STATE;
         else if (position == -2) messageState = MessageState.ADD_NEW_MESSAGE;
@@ -93,14 +91,12 @@ public class MessageActivity extends AppCompatActivity {
         imageView = findViewById(R.id.imageViewMessage);
         addPhotoLayout = findViewById(R.id.addPhotoLayout);
 
-        if (messageState == MessageState.STANDARD_STATE) {
+        if (messageState == MessageState.STANDARD_STATE) { //if during onCreate application is in that state, that means that the MessageModel has been sent from MainActivity
 
             messageModel = getIntent().getParcelableExtra("messageModel");
 
-            Glide.with(this)
-                    .load(messageModel.getIcon())
-                    .error(R.drawable.ic_launcher_foreground)
-                    .into(imageView);
+            glideDisplayImage(this, messageModel.getIcon());
+
             imageUri = messageModel.getIcon();
             textView1.setText(messageModel.getTitle());
             String description = messageModel.getDescription();
@@ -115,6 +111,13 @@ public class MessageActivity extends AppCompatActivity {
         }
         if (messageState == MessageState.STANDARD_STATE) disableEditMode();
         else if (messageState == MessageState.ADD_NEW_MESSAGE) enableEditMode(false);
+    }
+
+    private void glideDisplayImage(Context context, String imageSource) {
+        Glide.with(context)
+                .load(imageSource)
+                .error(R.drawable.ic_launcher_foreground)
+                .into(imageView);
     }
 
     @Override
@@ -161,10 +164,7 @@ public class MessageActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == PICK_IMAGE) {
             imageUri = data.getData().toString();
-            Glide.with(this)
-                    .load(imageUri)
-                    .error(R.drawable.ic_launcher_foreground)
-                    .into(imageView);
+            glideDisplayImage(this, imageUri);
         }
     }
 
@@ -181,14 +181,16 @@ public class MessageActivity extends AppCompatActivity {
     private void performEditOrStandardState() {
         boolean wasDataEdited = messageModel.getTitle().compareToIgnoreCase(textView1.getText().toString()) != 0 || messageModel.getDescription().compareToIgnoreCase(textView2.getText().toString()) != 0 || messageModel.getIcon().compareToIgnoreCase(imageUri) != 0;
         if (wasDataEdited) {
-            notifyChangesToMain();
-            messageModel.setIcon(imageUri);
-            messageModel.setTitle(textView1.getText().toString()); //I am doing this because if user changed data once -> clicked ok ->
-            messageModel.setDescription(textView2.getText().toString()); //-> didn't change data second time -> clicked back: the pop-up would still ask if he wants to save the changes even though it didn't change the second time
             //check if application is in edit state and if user committed any changes to original data
-            if (messageState == MessageState.MESSAGE_EDIT_STATE && wasDataEdited) {
+            if (messageState == MessageState.MESSAGE_EDIT_STATE) {
                 popUp(getString(R.string.want_to_save), getString(R.string.yes), getString(R.string.no));
-            } else finish();
+            } else {
+                notifyChangesToMain();
+                messageModel.setIcon(imageUri);
+                messageModel.setTitle(textView1.getText().toString()); //I am doing this because if user changed data once -> clicked ok ->
+                messageModel.setDescription(textView2.getText().toString()); //-> didn't change data second time -> clicked back: the pop-up would still ask if he wants to save the changes even though it didn't change the second time
+                finish();
+            }
         } else finish();
     }
 
@@ -205,13 +207,6 @@ public class MessageActivity extends AppCompatActivity {
         Intent intent = getIntent();
         intent.putExtra("position", position);
         setResult(RESULT_OK, intent);
-    }
-
-    //set on imageView changed
-    private void setImageIfChanged() {
-        if (imageUri != null) {
-            messageModel.setIcon(imageUri.toString());
-        }
     }
 
     private boolean addMessage() {
@@ -280,7 +275,7 @@ public class MessageActivity extends AppCompatActivity {
         editText.setTextColor(Color.BLACK);
         editText.setBackgroundColor(Color.TRANSPARENT);
         if (setBackground)
-            editText.setBackground(getResources().getDrawable(R.drawable.rounded_style));
+            editText.setBackground(getDrawable(R.drawable.rounded_style));
     }
 
     private void enableEditText(EditText editText, boolean setBackground) {
@@ -295,7 +290,7 @@ public class MessageActivity extends AppCompatActivity {
         editText.setBackground(getDrawable(R.drawable.edit_text_style));
     }
 
-    public void showKeyboard(final EditText editText) {
+    private void showKeyboard(final EditText editText) {
         editText.requestFocus();
         editText.postDelayed(new Runnable() {
             @Override
@@ -307,15 +302,17 @@ public class MessageActivity extends AppCompatActivity {
         }, 150);
     }
 
-    public void popUp(String title, String buttonPositiveText, String buttonNegativeText) {
+    private void popUp(String title, String buttonPositiveText, String buttonNegativeText) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(title);
-
-        //disableEditMode();
 
         builder.setPositiveButton(buttonPositiveText, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                notifyChangesToMain();
+                messageModel.setIcon(imageUri);
+                messageModel.setTitle(textView1.getText().toString()); //I am doing this because if user changed data once -> clicked ok ->
+                messageModel.setDescription(textView2.getText().toString()); //-> didn't change data second time -> clicked back: the pop-up would still ask if he wants to save the changes even though it didn't change the second time
                 updateMessage(position);
                 disableEditMode();
             }
@@ -328,8 +325,10 @@ public class MessageActivity extends AppCompatActivity {
                     textView1.setText(messageModel.getTitle());
                 if (messageModel.getDescription().compareToIgnoreCase(textView2.getText().toString()) != 0)
                     textView2.setText(messageModel.getDescription());
-                if (messageModel.getIcon().compareToIgnoreCase(imageUri) != 0)
+                if (messageModel.getIcon().compareToIgnoreCase(imageUri) != 0) {
                     imageUri = messageModel.getIcon();
+                    glideDisplayImage(getApplicationContext(), messageModel.getIcon());
+                }
                 Log.i("SafeKiddo", "TextView text: " + textView2.getText().toString() + " | description before: " + messageModel.getDescription());
                 disableEditMode();
             }
